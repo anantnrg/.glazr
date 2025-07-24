@@ -1,9 +1,13 @@
-import { createSignal, createEffect, onCleanup, onMount } from "solid-js";
+import { createSignal, onCleanup, onMount, Show } from "solid-js";
 
 export function MediaWidget(props: { session?: any }) {
-  const [shouldScroll, setShouldScroll] = createSignal(false);
+  const [scrollX, setScrollX] = createSignal(0);
+  const [transition, setTransition] = createSignal("none");
+
   let titleRef: HTMLSpanElement | undefined;
   let containerRef: HTMLDivElement | undefined;
+
+  let scrollTimer: number | undefined;
 
   const cleanTitle = (title: string, artist: string): string => {
     const artistPattern = new RegExp(`^${artist}\\s*-\\s*`, "i");
@@ -20,38 +24,72 @@ export function MediaWidget(props: { session?: any }) {
     return cleanTitle(props.session.title || "", props.session.artist || "");
   };
 
-  const checkScroll = () => {
+  const animateScroll = () => {
     if (!titleRef || !containerRef) return;
-    const needsScroll = titleRef.scrollWidth > containerRef.clientWidth;
-    setShouldScroll(needsScroll);
+
+    const titleWidth = titleRef.scrollWidth;
+    const containerWidth = containerRef.clientWidth;
+
+    if (titleWidth <= containerWidth) {
+      // No scroll needed
+      setScrollX(0);
+      setTransition("none");
+      return;
+    }
+
+    const distance = titleWidth - containerWidth;
+
+    // Scroll to the end
+    setTransition("transform 8s ease-in-out");
+    setScrollX(-distance);
+
+    // Wait till scroll ends, then scroll back
+    scrollTimer = window.setTimeout(() => {
+      setTransition("transform 8s ease-in-out");
+      setScrollX(0);
+    }, 8000);
+  };
+
+  const restartScroll = () => {
+    if (scrollTimer) clearTimeout(scrollTimer);
+    animateScroll();
   };
 
   onMount(() => {
-    checkScroll();
-    const int = setInterval(checkScroll, 3000);
-    onCleanup(() => clearInterval(int));
+    restartScroll();
+    const interval = setInterval(restartScroll, 18000); // adjust to avoid overlap
+    onCleanup(() => {
+      clearInterval(interval);
+      if (scrollTimer) clearTimeout(scrollTimer);
+    });
   });
 
-  createEffect(() => {
-    props.session?.title && checkScroll();
-  });
+  const player = () => props.session?.playerName?.toLowerCase() ?? "";
+
+  const allowed = () =>
+    props.session &&
+    !["chrome", "firefox", "youtube", "vlc"].some((bad) =>
+      player().includes(bad),
+    );
 
   return (
-    <div class="module red media">
-      <span class="icon"></span>
-      <div class="media-scroll-wrapper" ref={(el) => (containerRef = el)}>
-        <span
-          ref={(el) => (titleRef = el)}
-          class="media-title"
-          classList={{ scroll: shouldScroll() }}
-          style={{
-            transform: `translateX(${scrolling() ? scrollX() + "px" : "0"})`,
-            transition: scrolling() ? "transform 8s ease-in-out" : "none",
-          }}
-        >
-          {cleanedTitle()}, {artist}
-        </span>
+    <Show when={allowed()}>
+      <div class="red media">
+        <span class="icon"></span>
+        <div class="media-scroll-wrapper" ref={containerRef}>
+          <span
+            ref={titleRef}
+            class="media-title"
+            style={{
+              transform: `translateX(${scrollX()}px)`,
+              transition: transition(),
+            }}
+          >
+            {cleanedTitle()}
+            {props.session?.artist ? `, ${props.session.artist}` : ""}
+          </span>
+        </div>
       </div>
-    </div>
+    </Show>
   );
 }
