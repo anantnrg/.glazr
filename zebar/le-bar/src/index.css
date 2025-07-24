@@ -1,0 +1,108 @@
+body {
+    color: transparent;
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+.red {
+    color: #e46876;
+}
+
+.green {
+    color: #87a987;
+}
+
+.yellow {
+    color: #c4b28a;
+}
+
+.blue {
+    color: #7fb4ca;
+}
+
+.purple {
+    color: #a292a3;
+}
+
+.cyan {
+    color: #7aa89f;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+.app {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #c5c9c7;
+    user-select: none;
+    font-family: "MartianMono NF";
+}
+
+.left,
+.center,
+.right {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0 10px;
+}
+
+.left {
+    justify-content: start;
+}
+
+.right {
+    justify-content: end;
+}
+
+.module {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 4px 12px;
+    border-radius: 8px;
+    background: #090e13;
+    border: 2px solid;
+    border-color: #e46876;
+}
+
+.icon {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.workspace-mod {
+    display: flex;
+    gap: 0 16px;
+}
+
+.workspace {
+    display: block;
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    border-radius: 9999px;
+    background: #393b44;
+    will-change: width, background;
+    transition:
+        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        background 0.3s ease;
+    flex-shrink: 0;
+}
+
+.workspace.active {
+    background: #e46876;
+    width: 32px;
+}
