@@ -106,3 +106,22 @@ body,
     background: #e46876;
     width: 32px;
 }
+
+.media {
+    width: 240px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.media-scroll-wrapper {
+    overflow: hidden;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.media-title {
+    display: inline-block;
+    white-space: nowrap;
+}
