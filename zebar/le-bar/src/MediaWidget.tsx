@@ -31,7 +31,6 @@ export function MediaWidget(props: { session?: any }) {
     const containerWidth = containerRef.clientWidth;
 
     if (titleWidth <= containerWidth) {
-      // No scroll needed
       setScrollX(0);
       setTransition("none");
       return;
@@ -43,7 +42,7 @@ export function MediaWidget(props: { session?: any }) {
     setTransition("transform 8s ease-in-out");
     setScrollX(-distance);
 
-    // Wait till scroll ends, then scroll back
+    // Scroll back after 8s
     scrollTimer = window.setTimeout(() => {
       setTransition("transform 8s ease-in-out");
       setScrollX(0);
@@ -57,20 +56,15 @@ export function MediaWidget(props: { session?: any }) {
 
   onMount(() => {
     restartScroll();
-    const interval = setInterval(restartScroll, 18000); // adjust to avoid overlap
+    const interval = setInterval(restartScroll, 18000);
     onCleanup(() => {
       clearInterval(interval);
       if (scrollTimer) clearTimeout(scrollTimer);
     });
   });
 
-  const player = () => props.session?.playerName?.toLowerCase() ?? "";
-
   const allowed = () =>
-    props.session &&
-    !["chrome", "firefox", "youtube", "vlc"].some((bad) =>
-      player().includes(bad),
-    );
+    props.session && props.session.sessionId?.toLowerCase() === "kagi.exe";
 
   return (
     <Show when={allowed()}>
