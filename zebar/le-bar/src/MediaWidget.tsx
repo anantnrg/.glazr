@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createSignal, onCleanup, onMount } from "solid-js";
 
 export function MediaWidget(props: { session?: any }) {
   const [scrollX, setScrollX] = createSignal(0);
@@ -6,7 +6,6 @@ export function MediaWidget(props: { session?: any }) {
 
   let titleRef: HTMLSpanElement | undefined;
   let containerRef: HTMLDivElement | undefined;
-
   let scrollTimer: number | undefined;
 
   const cleanTitle = (title: string, artist: string): string => {
@@ -20,12 +19,14 @@ export function MediaWidget(props: { session?: any }) {
   };
 
   const cleanedTitle = () => {
-    if (!props.session) return "";
+    if (!props.session || !isKagi()) return "Nothing is playing...";
     return cleanTitle(props.session.title || "", props.session.artist || "");
   };
 
+  const isKagi = () => props.session?.sessionId?.toLowerCase() === "kagi.exe";
+
   const animateScroll = () => {
-    if (!titleRef || !containerRef) return;
+    if (!titleRef || !containerRef || !isKagi()) return;
 
     const titleWidth = titleRef.scrollWidth;
     const containerWidth = containerRef.clientWidth;
@@ -38,11 +39,9 @@ export function MediaWidget(props: { session?: any }) {
 
     const distance = titleWidth - containerWidth;
 
-    // Scroll to the end
     setTransition("transform 8s ease-in-out");
     setScrollX(-distance);
 
-    // Scroll back after 8s
     scrollTimer = window.setTimeout(() => {
       setTransition("transform 8s ease-in-out");
       setScrollX(0);
@@ -63,27 +62,22 @@ export function MediaWidget(props: { session?: any }) {
     });
   });
 
-  const allowed = () =>
-    props.session && props.session.sessionId?.toLowerCase() === "kagi.exe";
-
   return (
-    <Show when={allowed()}>
-      <div class="red media">
-        <span class="icon"></span>
-        <div class="media-scroll-wrapper" ref={containerRef}>
-          <span
-            ref={titleRef}
-            class="media-title"
-            style={{
-              transform: `translateX(${scrollX()}px)`,
-              transition: transition(),
-            }}
-          >
-            {cleanedTitle()}
-            {props.session?.artist ? `, ${props.session.artist}` : ""}
-          </span>
-        </div>
+    <div class="red media">
+      <span class="icon"></span>
+      <div class="media-scroll-wrapper" ref={containerRef}>
+        <span
+          ref={titleRef}
+          class="media-title"
+          style={{
+            transform: `translateX(${scrollX()}px)`,
+            transition: transition(),
+          }}
+        >
+          {cleanedTitle()}
+          {isKagi() && props.session?.artist ? `, ${props.session.artist}` : ""}
+        </span>
       </div>
-    </Show>
+    </div>
   );
 }
