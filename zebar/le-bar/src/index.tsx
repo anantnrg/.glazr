@@ -90,7 +90,7 @@ function App() {
         </div>
       </div>
       <div class="center">
-        <div class="module accent workspace-mod">
+        <div class="module red workspace-mod">
           {[...Array(8)].map((_, i) => (
             <div
               class={`workspace ${output.glazewm?.focusedWorkspace?.name === (i + 1).toString() ? "active" : ""}`}

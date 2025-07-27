@@ -72,10 +72,10 @@ body,
     justify-content: center;
     height: 100%;
     padding: 4px 12px;
-    border-radius: 8px;
+    border-radius: 36px;
     background: #090e13;
-    border: 2px solid;
-    border-color: #e46876;
+    border: 1px solid;
+    /* border-color: #e46876; */
 }
 
 .icon {
